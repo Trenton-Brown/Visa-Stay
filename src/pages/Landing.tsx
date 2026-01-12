@@ -146,7 +146,7 @@ export function Landing() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50/50 via-white to-white">
       {/* Navigation */}
       <nav className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
+        <div className="mx-auto w-full max-w-6xl px-4 py-4">
           <div className="flex items-center justify-between">
             <a href="/" className="flex items-center">
               <img
@@ -181,13 +181,13 @@ export function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 pt-4 pb-4 md:pt-4 md:pb-4 relative">
-        <div className="max-w-7xl mx-auto">
+      <section className="mx-auto w-full max-w-6xl px-4 pt-4 pb-4 md:pt-4 md:pb-4 relative">
+        <div className="w-full">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: Text Content */}
             <div className="text-center lg:text-left space-y-8">
-              <div className="space-y-4 relative rounded-2xl overflow-hidden p-8 md:p-12 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop&q=80)' }}>
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/70 via-blue-800/60 to-cyan-900/70"></div>
+              <div className="space-y-4 relative rounded-2xl overflow-hidden p-8 md:p-12 bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-600">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/45 via-blue-800/35 to-cyan-900/45"></div>
                 <div className="relative z-10">
                   <Badge variant="secondary" className="mb-4 bg-white/20 backdrop-blur-sm text-white border-white/30">
                     <Sparkles className="w-3 h-3 mr-1" />
@@ -341,7 +341,7 @@ export function Landing() {
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-4 py-24">
+      <section className="mx-auto w-full max-w-6xl px-4 py-24">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card className="border-2 border-blue-100 shadow-md hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-blue-50/30 overflow-hidden group">
@@ -408,7 +408,7 @@ export function Landing() {
       </section>
 
       {/* Destinations Gallery Section */}
-      <section className="container mx-auto px-4 py-24 bg-gradient-to-b from-white to-slate-50">
+      <section className="mx-auto w-full max-w-6xl px-4 py-24 bg-gradient-to-b from-white to-slate-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold tracking-tight mb-4 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
@@ -472,7 +472,7 @@ export function Landing() {
       </section>
 
       {/* Pricing Section */}
-      <section className="container mx-auto px-4 py-24">
+      <section className="mx-auto w-full max-w-6xl px-4 py-24">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold tracking-tight mb-4 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">Simple Pricing</h2>
@@ -544,7 +544,7 @@ export function Landing() {
 
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-slate-50/50 mt-24">
-        <div className="container mx-auto px-4 py-12">
+        <div className="mx-auto w-full max-w-6xl px-4 py-12">
           <div className="text-center">
             <a href="/" className="inline-flex items-center justify-center mb-2">
               <img
