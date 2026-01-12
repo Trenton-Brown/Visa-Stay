@@ -1,6 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 
+// Ensure we can read the raw request body for Stripe signature verification.
+// (If the platform/framework parses the body first, signature verification can fail.)
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
+
 function json(res: any, status: number, body: any) {
   res.statusCode = status
   res.setHeader('Content-Type', 'application/json; charset=utf-8')
@@ -8,6 +16,15 @@ function json(res: any, status: number, body: any) {
 }
 
 async function readRawBody(req: any): Promise<Buffer> {
+  // Some runtimes may provide a pre-read body.
+  if (Buffer.isBuffer(req?.body)) return req.body
+  if (typeof req?.body === 'string') return Buffer.from(req.body)
+  if (req?.body && typeof req.body === 'object') {
+    throw new Error(
+      'Request body was parsed before webhook verification. Disable body parsing so Stripe signature verification can use the raw body.'
+    )
+  }
+
   const chunks: Buffer[] = []
   for await (const chunk of req) {
     chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
@@ -35,7 +52,8 @@ export default async function handler(req: any, res: any) {
   const stripe = new Stripe(stripeSecretKey, { apiVersion: '2024-06-20' })
   const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey)
 
-  const sig = req.headers['stripe-signature']
+  const sigHeader = req.headers['stripe-signature']
+  const sig = Array.isArray(sigHeader) ? sigHeader[0] : sigHeader
   if (!sig || typeof sig !== 'string') return json(res, 400, { error: 'Missing stripe-signature header' })
 
   let event: Stripe.Event

@@ -4,6 +4,22 @@ import Stripe from 'stripe'
 const PRICE_MONTHLY = 'price_1SoYqrQcj37z6ydVlpt9vLDN'
 const PRICE_YEARLY = 'price_1SoYrlQcj37z6ydVkSupTxsO'
 
+function resolveBaseUrl(req: any): string {
+  const explicit =
+    process.env.VITE_BASE_URL || process.env.BASE_URL || process.env.SITE_URL || process.env.URL || process.env.DEPLOY_URL
+  if (explicit && typeof explicit === 'string') return explicit.replace(/\/+$/, '')
+
+  const vercel = process.env.VERCEL_URL
+  if (vercel && typeof vercel === 'string') return `https://${vercel}`.replace(/\/+$/, '')
+
+  const host = req?.headers?.['x-forwarded-host'] || req?.headers?.host
+  const proto = req?.headers?.['x-forwarded-proto'] || 'http'
+  if (host && typeof host === 'string') return `${proto}://${host}`.replace(/\/+$/, '')
+
+  // Last-resort fallback (better than redirecting to the wrong production domain).
+  return 'http://localhost:5173'
+}
+
 function getBearerToken(req: any): string | null {
   const header = req?.headers?.authorization || req?.headers?.Authorization
   if (!header || typeof header !== 'string') return null
@@ -25,7 +41,7 @@ export default async function handler(req: any, res: any) {
   }
 
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY
-  const webhookBaseUrl = process.env.VITE_BASE_URL || 'https://visastay.app'
+  const baseUrl = resolveBaseUrl(req)
 
   const supabaseUrl = process.env.VITE_SUPABASE_URL
   const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
@@ -71,7 +87,7 @@ export default async function handler(req: any, res: any) {
     hasFreeAccess || (status && ['active', 'trialing'].includes(status) && currentPeriodEnd && currentPeriodEnd > Date.now())
 
   if (isPaid) {
-    return json(res, 200, { alreadyPaid: true, url: `${webhookBaseUrl}/trips` })
+    return json(res, 200, { alreadyPaid: true, url: `${baseUrl}/trips` })
   }
 
   let customerId = pref?.stripe_customer_id || null
@@ -88,8 +104,10 @@ export default async function handler(req: any, res: any) {
       .upsert({ user_id: user.id, email: user.email || null, stripe_customer_id: customerId }, { onConflict: 'user_id' })
   }
 
-  const successUrl = `${webhookBaseUrl}/trips`
-  const cancelUrl = `${webhookBaseUrl}/`
+  // Send users back through /upgrade so we can finalize access even if the webhook is delayed.
+  // The {CHECKOUT_SESSION_ID} placeholder is replaced by Stripe.
+  const successUrl = `${baseUrl}/upgrade?checkout=success&session_id={CHECKOUT_SESSION_ID}`
+  const cancelUrl = `${baseUrl}/upgrade?checkout=canceled`
 
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',

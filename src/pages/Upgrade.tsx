@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,6 +16,7 @@ export function Upgrade() {
   const { isPaid, loading } = useSubscriptionStatus()
   const [isStartingCheckout, setIsStartingCheckout] = useState<'monthly' | 'yearly' | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isFinalizing, setIsFinalizing] = useState(false)
   const autoStartedRef = useRef(false)
 
   if (!loading && isPaid) {
@@ -23,6 +24,60 @@ export function Upgrade() {
   }
 
   const preselectedPlan = (location.state as any)?.plan as 'monthly' | 'yearly' | undefined
+
+  const checkoutParams = useMemo(() => {
+    const params = new URLSearchParams(location.search)
+    return {
+      checkout: params.get('checkout'),
+      sessionId: params.get('session_id'),
+    }
+  }, [location.search])
+
+  // After Stripe redirects back, finalize access deterministically by syncing the Checkout Session.
+  useEffect(() => {
+    if (loading) return
+    if (isPaid) return
+    if (!isAuthenticated) return
+
+    if (checkoutParams.checkout !== 'success' || !checkoutParams.sessionId) return
+
+    let cancelled = false
+    const run = async () => {
+      setError(null)
+      setIsFinalizing(true)
+      try {
+        const { data: sessionData } = await supabase.auth.getSession()
+        const token = sessionData.session?.access_token
+        if (!token) {
+          navigate('/login', { replace: true, state: { redirectTo: '/upgrade' } })
+          return
+        }
+
+        const resp = await fetch('/api/stripe/sync-checkout-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ sessionId: checkoutParams.sessionId }),
+        })
+        const json = await resp.json()
+        if (!resp.ok) throw new Error(json?.error || 'Failed to finalize checkout')
+
+        // Give Supabase a moment to reflect, then send them to the paid area.
+        if (!cancelled) navigate('/trips', { replace: true })
+      } catch (err: any) {
+        if (!cancelled) setError(err?.message || 'Failed to finalize checkout')
+      } finally {
+        if (!cancelled) setIsFinalizing(false)
+      }
+    }
+
+    run()
+    return () => {
+      cancelled = true
+    }
+  }, [loading, isPaid, isAuthenticated, checkoutParams, navigate])
 
   useEffect(() => {
     if (autoStartedRef.current) return
@@ -95,6 +150,11 @@ export function Upgrade() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          {isFinalizing && (
+            <div className="text-sm text-slate-700 bg-slate-50 border border-slate-200 p-3 rounded-md">
+              Finalizing your purchase…
+            </div>
+          )}
           {error && <div className="text-sm text-red-700 bg-red-50 border border-red-200 p-3 rounded-md">{error}</div>}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -104,7 +164,7 @@ export function Upgrade() {
               <Button
                 className="w-full bg-slate-800 hover:bg-slate-900"
                 size="lg"
-                disabled={isStartingCheckout !== null}
+                disabled={isStartingCheckout !== null || isFinalizing}
                 onClick={() => startCheckout(PRICE_MONTHLY, 'monthly')}
               >
                 {isStartingCheckout === 'monthly' ? 'Starting…' : 'Continue'}
@@ -117,7 +177,7 @@ export function Upgrade() {
               <Button
                 className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
                 size="lg"
-                disabled={isStartingCheckout !== null}
+                disabled={isStartingCheckout !== null || isFinalizing}
                 onClick={() => startCheckout(PRICE_YEARLY, 'yearly')}
               >
                 {isStartingCheckout === 'yearly' ? 'Starting…' : 'Continue'}
