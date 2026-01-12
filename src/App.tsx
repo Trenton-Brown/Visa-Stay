@@ -6,7 +6,9 @@ import { Trips } from '@/pages/Trips'
 import { Dashboard } from '@/pages/Dashboard'
 import { Admin } from '@/pages/Admin'
 import { PassportDestinationPage } from '@/pages/PassportDestinationPage'
+import { Upgrade } from '@/pages/Upgrade'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { RequirePaid } from '@/components/RequirePaid'
 
 function App() {
   return (
@@ -16,9 +18,31 @@ function App() {
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/trips" element={<Trips />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/admin" element={<Admin />} />
+            <Route path="/upgrade" element={<Upgrade />} />
+            <Route
+              path="/trips"
+              element={
+                <RequirePaid>
+                  <Trips />
+                </RequirePaid>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <RequirePaid>
+                  <Dashboard />
+                </RequirePaid>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <RequirePaid>
+                  <Admin />
+                </RequirePaid>
+              }
+            />
             <Route path="/passport/:passportCode/:destinationCode" element={<PassportDestinationPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,6 +14,9 @@ export function Login() {
   const [isSignUp, setIsSignUp] = useState(false)
   const { login, signUp } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const redirectTo = (location.state as any)?.redirectTo as string | undefined
+  const plan = (location.state as any)?.plan as 'monthly' | 'yearly' | undefined
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,7 +40,7 @@ export function Login() {
         setIsSignUp(false)
       } else {
         await login(email, password)
-        navigate('/trips')
+        navigate(redirectTo || '/trips', { state: plan ? { plan } : undefined })
       }
     } catch (err: any) {
       setError(err.message || (isSignUp ? 'Sign up failed. Please try again.' : 'Login failed. Please try again.'))

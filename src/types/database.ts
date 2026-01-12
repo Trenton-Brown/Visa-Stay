@@ -72,6 +72,11 @@ export interface Database {
           email: string | null
           default_passport_country: string | null
           has_free_access: boolean
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string | null
+          current_period_end: string | null
+          price_id: string | null
           created_at: string
           updated_at: string
         }
@@ -80,6 +85,11 @@ export interface Database {
           email?: string | null
           default_passport_country?: string | null
           has_free_access?: boolean
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+          current_period_end?: string | null
+          price_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -88,6 +98,11 @@ export interface Database {
           email?: string | null
           default_passport_country?: string | null
           has_free_access?: boolean
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+          current_period_end?: string | null
+          price_id?: string | null
           created_at?: string
           updated_at?: string
         }
