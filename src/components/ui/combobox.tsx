@@ -23,6 +23,12 @@ interface ComboboxProps {
   placeholder?: string
   emptyMessage?: string
   searchPlaceholder?: string
+  /**
+   * Whether the dropdown should portal to <body>.
+   * - true (default): best for pages where parent stacking contexts/overflow can hide the dropdown
+   * - false: useful inside Radix Dialogs to avoid scroll-lock / outside-click quirks
+   */
+  portalled?: boolean
 }
 
 export function Combobox({
@@ -32,6 +38,7 @@ export function Combobox({
   placeholder = "Select...",
   emptyMessage = "No results found.",
   searchPlaceholder = "Search...",
+  portalled = true,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
 
@@ -50,10 +57,9 @@ export function Combobox({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      {/* In Dialogs, z-50 popovers can end up behind the dialog overlay/content, breaking scroll/click. */}
       <PopoverContent
-        portalled={false}
-        className="z-[60] w-[var(--radix-popover-trigger-width)] p-0"
+        portalled={portalled}
+        className="z-[100] w-[var(--radix-popover-trigger-width)] p-0"
         align="start"
       >
         <Command>

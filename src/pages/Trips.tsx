@@ -686,6 +686,7 @@ export function Trips() {
                         placeholder="Search and select destination..."
                         searchPlaceholder="Search destinations..."
                         emptyMessage="No destinations found."
+                        portalled={false}
                       />
                     )}
                   </div>
