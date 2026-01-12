@@ -183,11 +183,17 @@ export function Landing() {
       {/* Hero Section */}
       <section className="mx-auto w-full max-w-6xl px-4 pt-4 pb-4 md:pt-4 md:pb-4 relative">
         <div className="w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 gap-12 items-center">
             {/* Left: Text Content */}
-            <div className="text-center lg:text-left space-y-8">
-              <div className="space-y-4 relative rounded-2xl overflow-hidden p-8 md:p-12 bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-600">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/45 via-blue-800/35 to-cyan-900/45"></div>
+            <div className="text-center lg:text-left space-y-8 max-w-3xl mx-auto w-full">
+              <div
+                className="space-y-4 relative rounded-2xl overflow-hidden p-8 md:p-12 bg-cover bg-center bg-no-repeat"
+                style={{
+                  backgroundImage:
+                    'url(https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop&q=80)',
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-950/75 via-blue-900/60 to-cyan-950/75"></div>
                 <div className="relative z-10">
                   <Badge variant="secondary" className="mb-4 bg-white/20 backdrop-blur-sm text-white border-white/30">
                     <Sparkles className="w-3 h-3 mr-1" />
@@ -310,30 +316,6 @@ export function Landing() {
                     </div>
                   )}
                 </Card>
-              </div>
-            </div>
-
-            {/* Right: Hero Image */}
-            <div className="hidden lg:block relative">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=600&fit=crop&q=80"
-                  alt="Digital nomad working with laptop and passport"
-                  className="w-full h-[500px] object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent"></div>
-              </div>
-              {/* Floating card overlay */}
-              <div className="absolute -bottom-6 -left-6 bg-white rounded-xl shadow-xl p-4 border-2 border-blue-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                    <CheckCircle2 className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-slate-800">195+ Countries</p>
-                    <p className="text-sm text-slate-600">Covered worldwide</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
